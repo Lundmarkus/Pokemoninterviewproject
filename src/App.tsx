@@ -37,6 +37,16 @@ function App() {
   const [selectedIndex, setSelectedIndex] = useState<number>(-1);
   const [isModalOpen, setIsModalOpen] = useState(false);
 
+  
+  const [visibleColumns, setVisibleColumns] = useState({
+    Name: true,
+    Id: true,
+    Picture: JSON.parse(localStorage.getItem('showPicture') || 'true'),
+    Weight: JSON.parse(localStorage.getItem('showWeight') || 'true'),
+    Height: JSON.parse(localStorage.getItem('showHeight') || 'true'),
+    Types: JSON.parse(localStorage.getItem('showTypes') || 'true'),
+  });
+
   const { data: pokemons = [], isLoading, error } = useQuery<Pokemon[]>({
     queryKey: ['pokemons'],
     queryFn: fetchPokemons,
@@ -51,6 +61,15 @@ function App() {
   const handleCloseModal = () => {
     setIsModalOpen(false);
     setSelectedPokemon(null);
+  };
+
+  // Persist column visibility changes to localStorage
+  const handleColumnVisibilityChange = (column: string, isVisible: boolean) => {
+    setVisibleColumns((prev) => {
+      const updatedColumns = { ...prev, [column]: isVisible };
+      localStorage.setItem(`show${column}`, JSON.stringify(isVisible));
+      return updatedColumns;
+    });
   };
 
   useEffect(() => {
@@ -79,9 +98,24 @@ function App() {
 
   return (
     <div className="App">
+      <div className="column-config">
+        <h3>Configure Columns</h3>
+        {['Picture', 'Weight', 'Height', 'Types'].map((column) => (
+          <label key={column}>
+            <input
+              type="checkbox"
+              checked={visibleColumns[column]}
+              onChange={(e) => handleColumnVisibilityChange(column, e.target.checked)}
+            />
+            {column}
+          </label>
+        ))}
+      </div>
+
       <PokemonTable
         pokemons={pokemons}
         selectedPokemon={selectedPokemon}
+        visibleColumns={visibleColumns}
         onPokemonSelect={(pokemon, index) => handleOpenModal(pokemon, index)}
       />
 
