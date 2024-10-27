@@ -63,7 +63,7 @@ function App() {
     setSelectedPokemon(null);
   };
 
-  // Persist column visibility changes to localStorage
+  
   const handleColumnVisibilityChange = (column: string, isVisible: boolean) => {
     setVisibleColumns((prev) => {
       const updatedColumns = { ...prev, [column]: isVisible };
